@@ -90,13 +90,13 @@ namespace Bookmarky.DAL.ServiceImplementations
 			if (bookmark.Id == 0)
 			{
 				var dbBm = bookmark.MapTo<Bookmark_DB>();
-				_context.Bookmarks.Add(dbBm);
+                _context.Set<Bookmark_DB>().Add(dbBm);
 				_context.SaveChanges();	//Todo add error handling
 				bookmark.Id = dbBm.Id;
 			}
 			else
 			{
-				var existingBm = _context.Bookmarks.Find(bookmark.Id);
+				var existingBm = _context.Set<Bookmark_DB>().Find(bookmark.Id);
 				existingBm.Gist = bookmark.Gist;
 				existingBm.ResourceType = (ResourceType)bookmark.ResourceTypeId;
 				existingBm.SourceId = bookmark.SourceId;
@@ -112,7 +112,7 @@ namespace Bookmarky.DAL.ServiceImplementations
 		private IEnumerable<Bookmark_DB> getBookmarks(Expression<Func<Bookmark_DB, bool>> predicate = null
 			, params Expression<Func<Bookmark_DB, object>>[] includes)
 		{
-			var query = _context.Bookmarks.AsQueryable();
+			var query = _context.Set<Bookmark_DB>().AsQueryable();
 
 			includes.ForEach(i => query.Include(i));
 

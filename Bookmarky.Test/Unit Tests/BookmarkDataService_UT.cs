@@ -24,7 +24,7 @@ namespace Bookmarky.Test.Unit_Tests
 			var mockSet = new Mock<DbSet<Bookmark_DB>>();
 
 			mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark_DB());
-			mockContext.SetupGet(c => c.Bookmarks).Returns(mockSet.Object);
+			mockContext.Setup(c => c.Set<Bookmark_DB>()).Returns(mockSet.Object);
 			mockContext.Setup(c => c.SaveChanges());
 
 			var bm = new Bookmark_DTO
@@ -49,7 +49,7 @@ namespace Bookmarky.Test.Unit_Tests
 			var mockSet = new Mock<DbSet<Bookmark_DB>>();
 
 			mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark_DB());
-			mockContext.SetupGet(c => c.Bookmarks).Returns(mockSet.Object);
+			mockContext.Setup(c => c.Set<Bookmark_DB>()).Returns(mockSet.Object);
 			mockContext.Setup(c => c.SaveChanges());
 
 			var bm = new Bookmark_DTO
