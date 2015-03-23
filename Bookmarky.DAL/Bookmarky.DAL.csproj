@@ -60,6 +60,7 @@
     <Compile Include="EntityModels\Rating.cs" />
     <Compile Include="EntityModels\ResourceType.cs" />
     <Compile Include="EntityModels\Source.cs" />
+    <Compile Include="EntityModels\StickiedBookmark.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Schema\ContextInit.cs" />
     <Compile Include="ServiceImplementations\EFBookmarkDataService.cs" />

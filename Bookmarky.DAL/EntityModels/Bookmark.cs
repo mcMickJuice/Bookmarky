@@ -21,9 +21,4 @@ namespace Bookmarky.DAL.EntityModels
 		public virtual Source Source { get; set; }
 		public virtual Rating Rating { get; set; }
 	}
-
-
-
-
-
 }
