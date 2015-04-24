@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -20,5 +22,6 @@ namespace Bookmarky.DAL.EntityModels
 
 		public virtual Source Source { get; set; }
 		public virtual Rating Rating { get; set; }
+        public virtual ICollection<Tag> Tags { get; set; }
 	}
 }

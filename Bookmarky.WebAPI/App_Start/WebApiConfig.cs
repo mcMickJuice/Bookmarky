@@ -12,6 +12,9 @@ namespace Bookmarky.WebAPI
     {
         public static void Register(HttpConfiguration config)
         {
+            //Allow Cross Origin Resource Sharing
+            config.EnableCors();
+
             // Web API configuration and services
             // Configure Web API to use only bearer token authentication.
             config.SuppressDefaultHostAuthentication();
@@ -19,6 +22,11 @@ namespace Bookmarky.WebAPI
 
             // Web API routes
             config.MapHttpAttributeRoutes();
+
+            config.Routes.MapHttpRoute(
+                name: "ActionRoutingApi",
+                routeTemplate: "api/{controller}/{action}"
+                );
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

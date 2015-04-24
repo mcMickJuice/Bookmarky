@@ -8,9 +8,9 @@ namespace Bookmarky.DAL.EntityModels
 {
 	public enum ResourceType
 	{
-		Article,
-		Tutorial,
-		Video,
-		Reference
+		Article = 1,
+		Tutorial = 2,
+		Video = 3,
+		Reference = 4
 	}
 }

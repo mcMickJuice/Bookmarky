@@ -45,6 +45,10 @@
       <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
@@ -61,9 +65,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="DataRetrievalTest.cs" />
+    <Compile Include="Integration Tests\DataRetrievalTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Unit Tests\BookmarkDataService_UT.cs" />
+    <Compile Include="UnitTests\PredicateBuilderTests\BasePredicateBuilderTest.cs" />
+    <Compile Include="UnitTests\BookmarkDataService_UnitTest.cs" />
+    <Compile Include="UnitTests\PredicateBuilderTests\BookmarkSearchCriteriaPredicateBuilder_TagTests_UnitTests.cs" />
+    <Compile Include="UnitTests\PredicateBuilderTests\BookmarkSearchCriteriaPredicateBuilder_UnitTest.cs" />
+    <Compile Include="UnitTests\PredicateBuilderTests\MultipleCriteriaBookmarkSearchCriteriaPredicateBuilder_UnitTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bookmarky.DAL.Service\Bookmarky.DAL.Service.csproj">
@@ -80,7 +88,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

@@ -1,33 +1,25 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
-using Bookmark_DTO = Bookmarky.DTO.Bookmark;
-using Bookmark_DB = Bookmarky.DAL.EntityModels.Bookmark;
-using Bookmarky.DAL;
+﻿using System.Data.Entity;
 using Bookmarky.DAL.EntityModels;
-using System.Data.Entity;
 using Bookmarky.DAL.ServiceImplementations;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
-namespace Bookmarky.Test.Unit_Tests
+namespace Bookmarky.Test.UnitTests
 {
 	[TestClass]
-	public class BookmarkDataService_UT
+	public class BookmarkDataService_UnitTest
 	{
 		[TestMethod]
 		public void SaveBookmark_UpdateExisting()
 		{
 			var mockContext = new Mock<IBookmarkyContext>();
-			var mockSet = new Mock<DbSet<Bookmark_DB>>();
+			var mockSet = new Mock<DbSet<Bookmark>>();
 
-			mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark_DB());
-			mockContext.Setup(c => c.Set<Bookmark_DB>()).Returns(mockSet.Object);
+			mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark());
+			mockContext.Setup(c => c.Set<Bookmark>()).Returns(mockSet.Object);
 			mockContext.Setup(c => c.SaveChanges());
 
-			var bm = new Bookmark_DTO
+			var bm = new DTO.Bookmark
 			{
 				Id = 1,
 				Title = "test bm"
@@ -46,13 +38,13 @@ namespace Bookmarky.Test.Unit_Tests
 		public void SaveBookmark_CreateNew()
 		{
 			var mockContext = new Mock<IBookmarkyContext>();
-			var mockSet = new Mock<DbSet<Bookmark_DB>>();
+			var mockSet = new Mock<DbSet<Bookmark>>();
 
-			mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark_DB());
-			mockContext.Setup(c => c.Set<Bookmark_DB>()).Returns(mockSet.Object);
+			mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark());
+			mockContext.Setup(c => c.Set<Bookmark>()).Returns(mockSet.Object);
 			mockContext.Setup(c => c.SaveChanges());
 
-			var bm = new Bookmark_DTO
+			var bm = new DTO.Bookmark
 			{
 				Title = "test bm"
 			};

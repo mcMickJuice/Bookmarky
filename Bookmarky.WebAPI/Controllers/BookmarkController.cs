@@ -4,11 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using Bookmarky.DAL.Service;
 using Bookmarky.DTO;
 
 namespace Bookmarky.WebAPI.Controllers
 {
+    [EnableCors(origins: "http://localhost:9000", headers: "*", methods: "*")]
     public class BookmarkController : ApiController
     {
         private readonly IBookmarkDataService _dataService;
@@ -30,7 +32,7 @@ namespace Bookmarky.WebAPI.Controllers
         {
             var bookmark = _dataService.GetBookmarkById(id);
 
-            return bookmark ?? null;
+            return bookmark;
         }
 
         // POST: api/Bookmark
@@ -41,6 +43,17 @@ namespace Bookmarky.WebAPI.Controllers
 
             return returnBm;
         }
+
+        [AcceptVerbs("GET")]
+        //[Route("api/Bookmark/GetHomePageDetails")]
+        public HomePageSummary GetHomePageDetails()
+        {
+            var summary = _dataService.GetHomePageSummary();
+            return summary;
+        }
+
+        //[AcceptVerbs("GET")]
+        //[Route("api/Bookmark/")]
 
         //// DELETE: api/Bookmark/5
         //public void Delete(int id)

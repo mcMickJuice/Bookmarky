@@ -4,126 +4,146 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using LinqKit;
-using System.Text;
-using System.Threading.Tasks;
 using Bookmarky.DTO;
 using Bookmark_DTO = Bookmarky.DTO.Bookmark;
 using Bookmark_DB = Bookmarky.DAL.EntityModels.Bookmark;
 using Bookmarky.DAL.EntityModels;
-using Omu.ValueInjecter;
 using Bookmarky.Utility.Extensions;
 using System.Linq.Expressions;
 
 namespace Bookmarky.DAL.ServiceImplementations
 {
-	public class EFBookmarkDataService : IBookmarkDataService
-	{
-		private IBookmarkyContext _context;
-		private bool _isDisposed = false;
-		public EFBookmarkDataService(IBookmarkyContext context)
-		{
-			_context = context;
-		}
+    public class EFBookmarkDataService : IBookmarkDataService
+    {
+        private IBookmarkyContext _context;
+        private bool _isDisposed = false;
+        public EFBookmarkDataService(IBookmarkyContext context)
+        {
+            _context = context;
+        }
 
-		public void Dispose()
-		{
-			if (!_isDisposed)
-			{
-				_context.Dispose();
-				_isDisposed = true;
-			}
-		}
+        public void Dispose()
+        {
+            if (!_isDisposed)
+            {
+                _context.Dispose();
+                _isDisposed = true;
+            }
+        }
 
-		public IList<Bookmark_DTO> GetAllBookmarks()
-		{
-			var dbBms = getBookmarks();
+        public IEnumerable<Bookmark_DTO> GetAllBookmarks()
+        {
+            var dbBms = getBookmarks();
 
-			return dbBms.Select(b => b.MapTo<Bookmark_DTO>()).ToList();
-		}
+            return dbBms.Select(b => b.MapTo<Bookmark_DTO>()).ToList();
+        }
 
-		public IList<Bookmark_DTO> GetBookmarkByExample(Bookmark_DTO bookmark) //include properties???
-		{
-			throw new NotImplementedException();
-		}
+        public IEnumerable<Bookmark_DTO> GetUnreadBookmarks()
+        {
+            var predicate = PredicateBuilder.True<Bookmark_DB>()
+                .And(b => !b.IsRead);
 
-		public IList<Bookmark_DTO> GetBookmarksBySource(int sourceId)
-		{
-			var dbBms = getBookmarks(b => b.SourceId == sourceId);
+            var dbBms = getBookmarks(predicate);
 
-			return dbBms.Select(b => b.MapTo<Bookmark_DTO>()).ToList();
-		}
+            return dbBms.Select(b => b.MapTo<Bookmark_DTO>()).ToList();
+        }
 
-		public IList<Bookmark_DTO> GetUnreadBookmarks()
-		{
-			var predicate = PredicateBuilder.True<Bookmark_DB>()
-				.And(b => !b.IsRead);
+        public Bookmark_DTO GetBookmarkById(int id)
+        {
+            var dbBm = getBookmarks(b => b.Id == id).FirstOrDefault();
 
-			var dbBms = getBookmarks(predicate);
+            if (dbBm == null)
+                return null;
 
-			return dbBms.Select(b => b.MapTo<Bookmark_DTO>()).ToList();
-		}
+            return dbBm.MapTo<Bookmark_DTO>();
+        }
 
-	    public Bookmark_DTO GetBookmarkById(int id)
-	    {
-	        var dbBm = getBookmarks(b => b.Id == id).FirstOrDefault();
+        public void UpdateIsReadStatus(int bookmarkId, bool isRead)
+        {
+            var db = getBookmarks(b => b.Id == bookmarkId).FirstOrDefault();
 
-	        if (dbBm == null)
-	            return null;
+            if (db == null)
+                return;
 
-	        return dbBm.MapTo<Bookmark_DTO>();
-	    }
+            db.IsRead = isRead;
+            _context.SaveChanges();
+        }
 
-	    public void UpdateIsReadStatus(int bookmarkId, bool isRead)
-		{
-			var db = getBookmarks(b => b.Id == bookmarkId).FirstOrDefault();
+        public HomePageSummary GetHomePageSummary()
+        {
+            var stickied = _context.Set<Bookmark_DB>()
+                .OfType<StickiedBookmark>()
+                .ToList();
 
-		    if (db == null)
-		        return;
+            var stickiedDto = stickied.Select(s => s.MapTo<Bookmark_DTO>());
 
-			db.IsRead = isRead;
-			_context.SaveChanges();
-		}
+            var recent = _context.Set<Bookmark_DB>().OrderByDescending(b => b.CreatedDate)
+                .Take(10)
+                .ToList();
 
-		public Bookmark_DTO SaveBookmark(Bookmark_DTO bookmark)
-		{
+            var recentDto = recent.Select(r => r.MapTo<Bookmark_DTO>());
 
-			if (bookmark.Id == 0)
-			{
-				var dbBm = bookmark.MapTo<Bookmark_DB>();
+            var homePage = new HomePageSummary
+            {
+                RecentBookmarks = recentDto,
+                StickiedBookmarks = stickiedDto
+            };
+
+            return homePage;
+        }
+
+        public Bookmark_DTO SaveBookmark(Bookmark_DTO bookmark)
+        {
+
+            if (bookmark.Id == 0)
+            {
+                var dbBm = bookmark.MapTo<Bookmark_DB>();
                 _context.Set<Bookmark_DB>().Add(dbBm);
-				_context.SaveChanges();	//Todo add error handling
-				bookmark.Id = dbBm.Id;
-			}
-			else
-			{
-				var existingBm = _context.Set<Bookmark_DB>().Find(bookmark.Id);
-				existingBm.Gist = bookmark.Gist;
-				existingBm.ResourceType = (ResourceType)bookmark.ResourceTypeId;
-				existingBm.SourceId = bookmark.SourceId;
-				existingBm.Title = bookmark.Title;
-				existingBm.Url = bookmark.Url;
+                _context.SaveChanges();	//Todo add error handling
+                bookmark.Id = dbBm.Id;
+            }
+            else
+            {
+                var existingBm = _context.Set<Bookmark_DB>().Find(bookmark.Id);
+                existingBm.Gist = bookmark.Gist;
+                existingBm.ResourceType = (ResourceType)bookmark.ResourceTypeId;
+                existingBm.SourceId = bookmark.SourceId;
+                existingBm.Title = bookmark.Title;
+                existingBm.Url = bookmark.Url;
 
-				_context.SaveChanges();
-			}
-			
-			return bookmark;
-		}
+                _context.SaveChanges();
+            }
 
-		private IEnumerable<Bookmark_DB> getBookmarks(Expression<Func<Bookmark_DB, bool>> predicate = null
-			, params Expression<Func<Bookmark_DB, object>>[] includes)
-		{
-			var query = _context.Set<Bookmark_DB>().AsQueryable();
+            return bookmark;
+        }
 
-			includes.ForEach(i => query.Include(i));
+        public IEnumerable<Bookmark_DTO> SearchBookmarksByCriteria(BookmarkSearchCriteria searchCriteria)
+        {
+            var searchCriteriaBuilder = new SearchCriteriaBuilder<Bookmark_DB>(searchCriteria.IsAnd);
 
-			if (predicate != null)
-			{
-				query = query.AsExpandable().Where(predicate);
-			}
+            var creator = new BookmarkSearchPredicateCreator(searchCriteria);
+            creator.GetPredicateList().ForEach(p => searchCriteriaBuilder.AppendCriteria(p));
 
-			return query.ToList();
-		}
+            var predicate = searchCriteriaBuilder.BuildPredicate();
+            var bmDbs = getBookmarks(predicate);
 
-		
-	}
+            return bmDbs.Select(r => r.MapTo<Bookmark_DTO>());
+        }
+
+        private IQueryable<Bookmark_DB> getBookmarks(Expression<Func<Bookmark_DB, bool>> predicate = null
+            , params Expression<Func<Bookmark_DB, object>>[] includes)
+        {
+            var query = _context.Set<Bookmark_DB>().AsQueryable();
+
+            includes.ForEach(i => query.Include(i));
+
+            if (predicate != null)
+            {
+                query = query.AsExpandable().Where(predicate);
+            }
+
+            return query;
+        }
+
+    }
 }

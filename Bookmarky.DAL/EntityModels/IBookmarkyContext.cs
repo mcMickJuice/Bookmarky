@@ -11,10 +11,6 @@ namespace Bookmarky.DAL.EntityModels
 {
     public interface IBookmarkyContext : IDisposable
     {
-        //DbSet<Bookmark> Bookmarks { get; set; }
-        //DbSet<Source> Sources { get; set; }
-        //DbSet<Rating> Ratings { get; set; }
-
         IEnumerable<DbEntityValidationResult> GetValidationErrors();
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
         DbSet Set(Type entityType);

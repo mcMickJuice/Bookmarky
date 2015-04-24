@@ -61,9 +61,12 @@
     <Compile Include="EntityModels\ResourceType.cs" />
     <Compile Include="EntityModels\Source.cs" />
     <Compile Include="EntityModels\StickiedBookmark.cs" />
+    <Compile Include="EntityModels\Tag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Schema\ContextInit.cs" />
+    <Compile Include="ServiceImplementations\BookmarkSearchPredicateCreator.cs" />
     <Compile Include="ServiceImplementations\EFBookmarkDataService.cs" />
+    <Compile Include="ServiceImplementations\SearchCriteriaBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

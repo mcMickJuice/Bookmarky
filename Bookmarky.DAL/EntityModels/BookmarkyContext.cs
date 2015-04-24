@@ -17,6 +17,12 @@ namespace Bookmarky.DAL.EntityModels
 			Configuration.LazyLoadingEnabled = false;
 		}
 
+	    public BookmarkyContext(string connectionString)
+	        : base(connectionString)
+	    {
+	        Configuration.LazyLoadingEnabled = false;
+	    }
+
 		public DbSet<Bookmark> Bookmarks { get; set; }
 		public DbSet<Source> Sources { get; set; }
 		public DbSet<Rating> Ratings { get; set; }
@@ -48,9 +54,15 @@ namespace Bookmarky.DAL.EntityModels
 				.HasOptional(b => b.Rating)
 				.WithOptionalDependent();
 
-			//modelBuilder.Entity<Rating>()
-			//	.HasRequired(b => b.Bookmark)
-			//	.WithRequiredPrincipal();
+		    modelBuilder.Entity<Bookmark>()
+		        .HasMany(b => b.Tags)
+		        .WithMany(b => b.Bookmarks)
+		        .Map(m =>
+		        {
+		            m.MapLeftKey("TagId");
+		            m.MapRightKey("BookmarkId");
+		            m.ToTable("TagBookmarkMapping");
+		        });
 
 		}
 	}
