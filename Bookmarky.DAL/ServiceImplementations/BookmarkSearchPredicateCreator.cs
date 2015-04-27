@@ -35,7 +35,7 @@ namespace Bookmarky.DAL.ServiceImplementations
         private Expression<Func<Bookmark, bool>> getBasePredicate()
         {
             //If this ISNT And, then Or is used downstream which will result in any separate True to return all bookmarks
-            if (_criteria.IsAnd)
+            if (_criteria.AndOrFieldLogic == LogicType.And)
                 return PredicateBuilder.True<Bookmark>();
 
             return PredicateBuilder.False<Bookmark>();
@@ -66,15 +66,15 @@ namespace Bookmarky.DAL.ServiceImplementations
             if (!_criteria.TagIds.Any())
                 return getBasePredicate();
 
-            if (_criteria.IsAllTags)
+            if (_criteria.AnyAllTagLogic == InclusionType.All)
             {
-                return bm => bm.Tags != null 
+                return bm => bm.Tags.Any()
                     && !_criteria.TagIds
                     .Except(bm.Tags.Select(t => t.Id)) //left hand side comparison. Any that don't match left side to right side, there will be remaining Ids.
                     .Any();
             }
 
-            return bm => bm.Tags != null && _criteria.TagIds
+            return bm => bm.Tags.Any() && _criteria.TagIds
                 .Intersect(bm.Tags.Select(t => t.Id))
                 .Any();
 

@@ -7,7 +7,7 @@ using Bookmarky.DTO;
 
 namespace Bookmarky.DAL.Service
 {
-	public interface IBookmarkDataService : IBookmarkSearch,IDisposable
+	public interface IBookmarkDataService : IDisposable
 	{
 		IEnumerable<Bookmark> GetAllBookmarks();
 		IEnumerable<Bookmark> GetUnreadBookmarks();
@@ -19,8 +19,9 @@ namespace Bookmarky.DAL.Service
 		/// <returns>Created or Updated Bookmark</returns>
 		Bookmark SaveBookmark(Bookmark bookmark);
 		void UpdateIsReadStatus(int bookmarkId,bool isRead);
-	    HomePageSummary GetHomePageSummary();
-
+        IEnumerable<Bookmark> SearchBookmarksByCriteria(BookmarkSearchCriteria searchCriteria);
+        HomePageSummary GetHomePageSummary();
+        BookmarkSearchInitialization CreateInitialSearchObject();
 
 	}
 

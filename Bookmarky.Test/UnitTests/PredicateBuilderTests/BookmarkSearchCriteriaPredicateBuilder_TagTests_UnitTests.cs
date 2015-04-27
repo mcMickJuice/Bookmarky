@@ -128,7 +128,7 @@ namespace Bookmarky.Test.UnitTests.PredicateBuilderTests
             var criteria = new BookmarkSearchCriteria()
             {
                 TagIds = new List<int>() { 1, 67 },
-                IsAllTags = true
+                AnyAllTagLogic = InclusionType.All
             };
 
             var results = applyPredicateToList(bookmarkList, criteria);
@@ -172,7 +172,7 @@ namespace Bookmarky.Test.UnitTests.PredicateBuilderTests
             var criteria = new BookmarkSearchCriteria()
             {
                 TagIds = new List<int>() { 1, 67,999 },
-                IsAllTags = true
+                AnyAllTagLogic = InclusionType.All
             };
 
             var results = applyPredicateToList(bookmarkList, criteria);
@@ -221,7 +221,7 @@ namespace Bookmarky.Test.UnitTests.PredicateBuilderTests
             var criteria = new BookmarkSearchCriteria()
             {
                 TagIds = new List<int>() { 1, 67 },
-                IsAllTags = false
+                AnyAllTagLogic = InclusionType.Any
             };
 
             var results = applyPredicateToList(bookmarkList, criteria);
@@ -272,7 +272,7 @@ namespace Bookmarky.Test.UnitTests.PredicateBuilderTests
             var criteria = new BookmarkSearchCriteria()
             {
                 TagIds = new List<int>() { 11, 63,10987 },
-                IsAllTags = false
+                AnyAllTagLogic = InclusionType.Any
             };
 
             var results = applyPredicateToList(bookmarkList, criteria);

@@ -7,6 +7,7 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using Bookmarky.DAL.Service;
 using Bookmarky.DTO;
+using Microsoft.Ajax.Utilities;
 
 namespace Bookmarky.WebAPI.Controllers
 {
@@ -52,12 +53,19 @@ namespace Bookmarky.WebAPI.Controllers
             return summary;
         }
 
-        //[AcceptVerbs("GET")]
-        //[Route("api/Bookmark/")]
+        [AcceptVerbs("GET")]
+        public BookmarkSearchInitialization GetSearchInitialization()
+        {
+            var initialization = _dataService.CreateInitialSearchObject();
+            return initialization;
+        }
 
-        //// DELETE: api/Bookmark/5
-        //public void Delete(int id)
-        //{
-        //}
+        [AcceptVerbs("POST")]
+        public IEnumerable<Bookmark> GetBookmarkBySearch(BookmarkSearchCriteria criteria)
+        {
+            var bookmarks = _dataService.SearchBookmarksByCriteria(criteria);
+
+            return bookmarks;
+        }
     }
 }

@@ -42,7 +42,7 @@ namespace Bookmarky.Test.UnitTests.PredicateBuilderTests
             {
                 MinimumRating = 4,
                 ResourceTypeIds = new List<int> { (int)ResourceType.Reference },
-                IsAnd = true
+                AndOrFieldLogic = LogicType.And
             };
 
             var result = applyPredicateToList(bookmarkList, searchCriteria);
@@ -81,7 +81,7 @@ namespace Bookmarky.Test.UnitTests.PredicateBuilderTests
             {
                 MinimumRating = 5,
                 ResourceTypeIds = new List<int> { (int)ResourceType.Tutorial },
-                IsAnd = true
+                AndOrFieldLogic = LogicType.And
             };
 
             var result = applyPredicateToList(bookmarkList, searchCriteria);

@@ -11,6 +11,13 @@ namespace Bookmarky.DAL.Schema
 	{
 		protected override void Seed(BookmarkyContext context)
 		{
+            var tag1 = new Tag() { Id = 1, TagName = "Javascript" };
+            var tag2 = new Tag() { Id = 2, TagName = "C#" };
+            var tag3 = new Tag() { Id = 3, TagName = "Design Patterns" };
+            var tag4 = new Tag() { Id = 4, TagName = "Database" };
+
+		    context.Tags.AddRange(new List<Tag> {tag1, tag2, tag3, tag4});
+		    context.SaveChanges();
 
 			var b1 = new Bookmark { Title = "Bookmark 1", Gist = "The maiden voyage", Url = "www.buttlash.com", ResourceType = ResourceType.Article };
 			var b2 = new Bookmark { Title = "Bookmark 2", Gist = "Something Else", Url = "www.youtube.com", ResourceType = ResourceType.Video };

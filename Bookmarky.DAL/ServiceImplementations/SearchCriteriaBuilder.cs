@@ -12,7 +12,7 @@ namespace Bookmarky.DAL.ServiceImplementations
         public SearchCriteriaBuilder(bool isAnd)
         {
             _isAnd = isAnd;
-            _predicate = PredicateBuilder.True<T>();
+            _predicate = isAnd ? PredicateBuilder.True<T>() : PredicateBuilder.False<T>();
         }
 
         public SearchCriteriaBuilder<T> AppendCriteria(Expression<Func<T, bool>> predicate)

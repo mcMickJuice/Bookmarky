@@ -7,6 +7,8 @@ using LinqKit;
 using Bookmarky.DTO;
 using Bookmark_DTO = Bookmarky.DTO.Bookmark;
 using Bookmark_DB = Bookmarky.DAL.EntityModels.Bookmark;
+using Tag_DTO = Bookmarky.DTO.Tag;
+using Tag_DB = Bookmarky.DAL.EntityModels.Tag;
 using Bookmarky.DAL.EntityModels;
 using Bookmarky.Utility.Extensions;
 using System.Linq.Expressions;
@@ -92,6 +94,51 @@ namespace Bookmarky.DAL.ServiceImplementations
             return homePage;
         }
 
+        public BookmarkSearchInitialization CreateInitialSearchObject()
+        {
+            var tags = getTags()
+                .Select(t => t.MapTo<Tag_DTO>())
+                .ToList();
+
+            var resources = Enum.GetValues(typeof (ResourceType))
+                .OfType<ResourceType>()
+                .Select(t => new
+                {
+                    Id = (int) t,
+                    ResourceName = t.ToString()
+                });
+
+            var logicTypes = Enum.GetValues(typeof (LogicType))
+                .OfType<LogicType>()
+                .Select(t => new
+                {
+                    Id = (int) t,
+                    LogicName = t.ToString()
+                });
+
+            var inclusionTypes = Enum.GetValues(typeof (InclusionType))
+                .OfType<InclusionType>()
+                .Select(t => new
+                {
+                    Id = (int)t,
+                    InclusionName = t.ToString()
+                });
+
+            var initialization = new BookmarkSearchInitialization
+            {
+                SearchCriteria = new BookmarkSearchCriteria(),
+                FieldInitialization = new BookmarkSearchFieldInitialization
+                {
+                    AvailableTags = tags,
+                    Resources = resources,
+                    LogicTypes = logicTypes,
+                    InclusionTypes = inclusionTypes
+                }
+            };
+
+            return initialization;
+        }
+
         public Bookmark_DTO SaveBookmark(Bookmark_DTO bookmark)
         {
 
@@ -119,7 +166,8 @@ namespace Bookmarky.DAL.ServiceImplementations
 
         public IEnumerable<Bookmark_DTO> SearchBookmarksByCriteria(BookmarkSearchCriteria searchCriteria)
         {
-            var searchCriteriaBuilder = new SearchCriteriaBuilder<Bookmark_DB>(searchCriteria.IsAnd);
+            var isAndFieldLogic = searchCriteria.AndOrFieldLogic == LogicType.And;
+            var searchCriteriaBuilder = new SearchCriteriaBuilder<Bookmark_DB>(isAndFieldLogic);
 
             var creator = new BookmarkSearchPredicateCreator(searchCriteria);
             creator.GetPredicateList().ForEach(p => searchCriteriaBuilder.AppendCriteria(p));
@@ -130,7 +178,7 @@ namespace Bookmarky.DAL.ServiceImplementations
             return bmDbs.Select(r => r.MapTo<Bookmark_DTO>());
         }
 
-        private IQueryable<Bookmark_DB> getBookmarks(Expression<Func<Bookmark_DB, bool>> predicate = null
+        private IEnumerable<Bookmark_DB> getBookmarks(Expression<Func<Bookmark_DB, bool>> predicate = null
             , params Expression<Func<Bookmark_DB, object>>[] includes)
         {
             var query = _context.Set<Bookmark_DB>().AsQueryable();
@@ -142,7 +190,19 @@ namespace Bookmarky.DAL.ServiceImplementations
                 query = query.AsExpandable().Where(predicate);
             }
 
-            return query;
+            return query.ToList();
+        }
+
+        private IEnumerable<Tag_DB> getTags(Expression<Func<Tag_DB, bool>> predicate = null)
+        {
+            var query = _context.Set<Tag_DB>().AsQueryable();
+
+            if (predicate != null)
+            {
+                query = query.AsExpandable().Where(predicate);
+            }
+
+            return query.ToList();
         }
 
     }

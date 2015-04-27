@@ -41,7 +41,10 @@
   <ItemGroup>
     <Compile Include="Bookmark.cs" />
     <Compile Include="BookmarkSearchCriteria.cs" />
+    <Compile Include="BookmarkSearchFieldInitialization.cs" />
+    <Compile Include="BookmarkSearchInitialization.cs" />
     <Compile Include="HomePageSummary.cs" />
+    <Compile Include="LogicType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tag.cs" />
   </ItemGroup>
