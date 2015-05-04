@@ -41,6 +41,10 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="LinqKit, Version=1.1.2.0, Culture=neutral, PublicKeyToken=bc217f8844052a91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\LINQKit.1.1.2\lib\net45\LinqKit.dll</HintPath>
+    </Reference>
     <Reference Include="Moq, Version=4.2.1409.1722, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
@@ -48,6 +52,10 @@
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Omu.ValueInjecter, Version=2.3.3.0, Culture=neutral, PublicKeyToken=c7694541b0ac80e4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\valueinjecter.2.3.3\lib\net35\Omu.ValueInjecter.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -65,8 +73,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Integration Tests\BookmarkInsert_IntegrationTest.cs" />
+    <Compile Include="Integration Tests\BookmarkUpdate_IntegrationTest.cs" />
     <Compile Include="Integration Tests\DataRetrievalTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitTests\Mapping\BookmarkMapping_UnitTest.cs" />
     <Compile Include="UnitTests\PredicateBuilderTests\BasePredicateBuilderTest.cs" />
     <Compile Include="UnitTests\BookmarkDataService_UnitTest.cs" />
     <Compile Include="UnitTests\PredicateBuilderTests\BookmarkSearchCriteriaPredicateBuilder_TagTests_UnitTests.cs" />
@@ -85,6 +96,10 @@
     <ProjectReference Include="..\Bookmarky.DTO\Bookmarky.DTO.csproj">
       <Project>{7adb0321-9235-4d62-867b-15b520c8926f}</Project>
       <Name>Bookmarky.DTO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bookmarky.Utility\Bookmarky.Utility.csproj">
+      <Project>{2d2f4abc-4b7d-4178-98b5-fa89a7a05836}</Project>
+      <Name>Bookmarky.Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

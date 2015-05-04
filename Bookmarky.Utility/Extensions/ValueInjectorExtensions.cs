@@ -9,26 +9,29 @@ namespace Bookmarky.Utility.Extensions
 {
     public static class ValueInjectorExtensions
     {
-		public static T MapTo<T>(this object source) where T : new()
-		{
-			var obj = new T();
+        public static T MapTo<T>(this object source) where T : new()
+        {
+            var obj = new T();
 
-			return (T)obj.InjectFrom(source);
-		}
+            return (T)obj.InjectFrom(source);
+        }
 
-		public static T MapTo<T>(this object source, ConventionInjection customInjection) where T : new()
-		{
-			var obj = new T();
+        public static T MapTo<T>(this object source, ConventionInjection customInjection) where T : new()
+        {
+            var obj = new T();
 
-			return (T)obj.InjectFrom(customInjection, source);
-		}
+            return (T)obj.InjectFrom(customInjection, source);
+        }
     }
 
-	public class DefaultValueInjection : ConventionInjection
-	{
-		protected override bool Match(ConventionInfo c)
+    public class DefaultValueInjection : ConventionInjection
+    {
+        protected override bool Match(ConventionInfo c)
 		{
-			return c.SourceProp.Name == c.TargetProp.Name;
+            if(c.SourceProp.Type.IsPrimitive || c.SourceProp.Type.Name == "String")
+			    return c.SourceProp.Name == c.TargetProp.Name;
+
+            return false;
 		}
-	}
+    }
 }

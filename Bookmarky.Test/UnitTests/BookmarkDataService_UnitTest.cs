@@ -1,60 +1,171 @@
-﻿using System.Data.Entity;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 using Bookmarky.DAL.EntityModels;
+using Bookmarky.DAL.Mapping;
 using Bookmarky.DAL.ServiceImplementations;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Bookmarky.DTO;
+using Bookmarky.Utility.Extensions;
 using Moq;
+using NUnit.Framework;
+using Tag_Dto = Bookmarky.DTO.Tag;
+using Tag_Db = Bookmarky.DAL.EntityModels.Tag;
+using Bookmark_Dto = Bookmarky.DTO.Bookmark;
+using Bookmark_Db = Bookmarky.DAL.EntityModels.Bookmark;
 
 namespace Bookmarky.Test.UnitTests
 {
-	[TestClass]
+	
+    [TestFixture]
 	public class BookmarkDataService_UnitTest
-	{
-		[TestMethod]
-		public void SaveBookmark_UpdateExisting()
-		{
-			var mockContext = new Mock<IBookmarkyContext>();
-			var mockSet = new Mock<DbSet<Bookmark>>();
+    {
+        private Mock<IBookmarkyContext> _mockContext;
+        private Mock<DbSet<Bookmark_Db>> _mockSet;
+        private IBookmarkyMapper _mapper;
 
-			mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark());
-			mockContext.Setup(c => c.Set<Bookmark>()).Returns(mockSet.Object);
-			mockContext.Setup(c => c.SaveChanges());
+        [SetUp]
+        public void Init()
+        {
+            _mockContext = new Mock<IBookmarkyContext>();
+            _mockSet = new Mock<DbSet<Bookmark_Db>>();
+            _mapper = new BookmarkyMapper(new DefaultValueInjection());
+        }                 
+
+		[Test]
+		public void SaveBookmark_UpdateExisting_NoTags()
+		{
+            _mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark_Db() { Tags = new List<DAL.EntityModels.Tag>() });
+            _mockContext.Setup(c => c.Set<Bookmark_Db>()).Returns(_mockSet.Object);
+            _mockContext.Setup(c => c.SaveChanges());
 
 			var bm = new DTO.Bookmark
 			{
 				Id = 1,
-				Title = "test bm"
+				Title = "test bm",
+                Tags = new List<Tag_Dto>
+                {
+                    
+                }
 			};
 
-			var service = new EFBookmarkDataService(mockContext.Object);
+            var service = new EFBookmarkDataService(_mockContext.Object, _mapper);
 
-			service.SaveBookmark(bm);
+			service.UpdateBookmark(bm);
 
-			mockSet.Verify(s => s.Find(It.IsAny<int>()), Times.Once);
-			mockContext.Verify(s => s.SaveChanges(), Times.Once);
+            _mockSet.Verify(s => s.Find(It.IsAny<int>()), Times.Once);
+            _mockContext.Verify(s => s.SaveChanges(), Times.Once);
 
 		}
 
-		[TestMethod]
-		public void SaveBookmark_CreateNew()
+		[Test]
+		public void SaveBookmark_CreateNew_NoTags()
 		{
-			var mockContext = new Mock<IBookmarkyContext>();
-			var mockSet = new Mock<DbSet<Bookmark>>();
-
-			mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark());
-			mockContext.Setup(c => c.Set<Bookmark>()).Returns(mockSet.Object);
-			mockContext.Setup(c => c.SaveChanges());
+            _mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark_Db());
+            _mockSet.Setup(s => s.Add(It.IsAny<Bookmark_Db>()));
+            _mockContext.Setup(c => c.Set<Bookmark_Db>()).Returns(_mockSet.Object);
+            _mockContext.Setup(c => c.SaveChanges());
 
 			var bm = new DTO.Bookmark
 			{
-				Title = "test bm"
+				Title = "test bm",
+                Tags = new List<Tag_Dto>()
 			};
 
-			var service = new EFBookmarkDataService(mockContext.Object);
+            var service = new EFBookmarkDataService(_mockContext.Object, _mapper);
 
-			service.SaveBookmark(bm);
+			service.CreateBookmark(bm);
 
-			mockSet.Verify(s => s.Find(It.IsAny<int>()), Times.Never);
-			mockContext.Verify(s => s.SaveChanges(), Times.Once);
+            _mockSet.Verify(s => s.Add(It.IsAny<Bookmark_Db>()), Times.Once);
+            _mockContext.Verify(s => s.SaveChanges(), Times.Once);
 		}
+
+        [Test]
+        public void SaveBookmark_Update_WithNewTags()
+        {
+            //Arrange
+            var newTags = new List<Tag_Dto>
+            {
+                new Tag_Dto() {Id = 1, TagName = "C#"},
+                new Tag_Dto() {Id = 2, TagName = "Microsoft"},
+                new Tag_Dto() {Id = 9, TagName = "Microsoft"},
+                new Tag_Dto() {Id = 199, TagName = "Microsoft"},
+            };
+
+            var existingTags = new List<Tag_Dto>()
+            {
+                new Tag_Dto() {Id = 5, TagName = "Async"}
+            };
+
+            var dtoBookmark = new Bookmark_Dto()
+            {
+                Gist = "This is a test", 
+                Tags = newTags.Concat(existingTags)
+            };
+            var dbBookmark = new Bookmark_Db()
+            {
+                Tags = new List<Tag_Db>()
+                {
+                    new Tag_Db(){Id = 5}
+                }
+            };
+
+            _mockContext.Setup(m => m.Set<Bookmark_Db>()).Returns(_mockSet.Object);
+            _mockSet.Setup(m => m.Find(It.IsAny<int>())).Returns(dbBookmark);
+
+            //Act
+            var service = new EFBookmarkDataService(_mockContext.Object, _mapper);
+
+            service.CreateBookmark(dtoBookmark);
+
+            //Assert
+            newTags.ForEach(newT => 
+                Assert.That(dtoBookmark.Tags
+                .Select(t => t.Id)
+                .Contains(newT.Id)));
+        }
+
+        [Test]
+        public void SaveBookmark_Update_WithDeletedTags()
+        {
+            //Arrange
+            var dbTags = new List<Tag_Db>
+            {
+                new Tag_Db() {Id = 1, TagName = "C#"},
+                new Tag_Db() {Id = 2, TagName = "Microsoft"},
+                new Tag_Db() {Id = 9, TagName = "Microsoft"},
+                new Tag_Db() {Id = 199, TagName = "Microsoft"},
+            };
+
+            var dtoTags = new List<Tag_Dto>
+            {
+                new Tag_Dto() {Id = 1, TagName = "C#"},
+                new Tag_Dto() {Id = 9, TagName = "Microsoft"},
+            };
+
+            var deletedTags = dbTags.Where(dbT => !dtoTags.Select(t => t.Id).Contains(dbT.Id));
+
+            var dtoBookmark = new Bookmark_Dto()
+            {
+                Gist = "This is a test",
+                Tags = dtoTags
+            };
+            var dbBookmark = new Bookmark_Db()
+            {
+                Tags = dbTags
+            };
+
+            _mockContext.Setup(m => m.Set<Bookmark_Db>()).Returns(_mockSet.Object);
+            _mockSet.Setup(m => m.Find(It.IsAny<int>())).Returns(dbBookmark);
+
+            //Act
+            var service = new EFBookmarkDataService(_mockContext.Object, _mapper);
+            service.UpdateBookmark(dtoBookmark);
+
+            //Assert
+            deletedTags.ToList().ForEach(t =>
+                Assert.That(!dbBookmark.Tags.Select(dbT => dbT.Id)
+                    .Contains(t.Id)));
+
+        }
 	}
 }

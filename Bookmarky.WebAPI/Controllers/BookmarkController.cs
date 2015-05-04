@@ -40,10 +40,11 @@ namespace Bookmarky.WebAPI.Controllers
         //how to return data?
         public Bookmark Post([FromBody]Bookmark bookmark)
         {
-            var returnBm = _dataService.SaveBookmark(bookmark);
+            var returnBm = _dataService.UpdateBookmark(bookmark);
 
             return returnBm;
         }
+
 
         [AcceptVerbs("GET")]
         //[Route("api/Bookmark/GetHomePageDetails")]

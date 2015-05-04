@@ -3,6 +3,5 @@
     public class StickiedBookmark:Bookmark
     {
         public string LinkIconUrl { get; set; }
-
     }
 }

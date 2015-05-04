@@ -17,7 +17,9 @@ namespace Bookmarky.DAL.Service
 		/// </summary>
 		/// <param name="bookmark">Bookmark to Persist</param>
 		/// <returns>Created or Updated Bookmark</returns>
-		Bookmark SaveBookmark(Bookmark bookmark);
+		Bookmark UpdateBookmark(Bookmark bookmark);
+
+	    Bookmark CreateBookmark(Bookmark bookmark);
 		void UpdateIsReadStatus(int bookmarkId,bool isRead);
         IEnumerable<Bookmark> SearchBookmarksByCriteria(BookmarkSearchCriteria searchCriteria);
         HomePageSummary GetHomePageSummary();

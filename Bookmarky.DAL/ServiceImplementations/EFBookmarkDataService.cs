@@ -1,4 +1,5 @@
-﻿using Bookmarky.DAL.Service;
+﻿using Bookmarky.DAL.Mapping;
+using Bookmarky.DAL.Service;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -15,13 +16,15 @@ using System.Linq.Expressions;
 
 namespace Bookmarky.DAL.ServiceImplementations
 {
-    public class EFBookmarkDataService : IBookmarkDataService
+    public class EFBookmarkDataService : IBookmarkDataService, ITagService
     {
         private IBookmarkyContext _context;
+        private readonly IBookmarkyMapper _mapper;
         private bool _isDisposed = false;
-        public EFBookmarkDataService(IBookmarkyContext context)
+        public EFBookmarkDataService(IBookmarkyContext context, IBookmarkyMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public void Dispose()
@@ -37,7 +40,7 @@ namespace Bookmarky.DAL.ServiceImplementations
         {
             var dbBms = getBookmarks();
 
-            return dbBms.Select(b => b.MapTo<Bookmark_DTO>()).ToList();
+            return dbBms.Select(_mapper.MapToBookmarkDto).ToList();
         }
 
         public IEnumerable<Bookmark_DTO> GetUnreadBookmarks()
@@ -47,18 +50,22 @@ namespace Bookmarky.DAL.ServiceImplementations
 
             var dbBms = getBookmarks(predicate);
 
-            return dbBms.Select(b => b.MapTo<Bookmark_DTO>()).ToList();
+            return dbBms.Select(_mapper.MapToBookmarkDto).ToList();
         }
 
         public Bookmark_DTO GetBookmarkById(int id)
         {
-            var dbBm = getBookmarks(b => b.Id == id).FirstOrDefault();
+            var dbBm = getBookmarks(b => b.Id == id, b => b.Tags).FirstOrDefault();
 
             if (dbBm == null)
                 return null;
 
-            return dbBm.MapTo<Bookmark_DTO>();
+            var bmDto = _mapper.MapToBookmarkDto(dbBm);
+
+            return bmDto;
         }
+
+
 
         public void UpdateIsReadStatus(int bookmarkId, bool isRead)
         {
@@ -77,13 +84,13 @@ namespace Bookmarky.DAL.ServiceImplementations
                 .OfType<StickiedBookmark>()
                 .ToList();
 
-            var stickiedDto = stickied.Select(s => s.MapTo<Bookmark_DTO>());
+            var stickiedDto = stickied.Select(_mapper.MapToBookmarkDto);
 
             var recent = _context.Set<Bookmark_DB>().OrderByDescending(b => b.CreatedDate)
                 .Take(10)
                 .ToList();
 
-            var recentDto = recent.Select(r => r.MapTo<Bookmark_DTO>());
+            var recentDto = recent.Select(_mapper.MapToBookmarkDto);
 
             var homePage = new HomePageSummary
             {
@@ -100,23 +107,23 @@ namespace Bookmarky.DAL.ServiceImplementations
                 .Select(t => t.MapTo<Tag_DTO>())
                 .ToList();
 
-            var resources = Enum.GetValues(typeof (ResourceType))
+            var resources = Enum.GetValues(typeof(ResourceType))
                 .OfType<ResourceType>()
                 .Select(t => new
                 {
-                    Id = (int) t,
+                    Id = (int)t,
                     ResourceName = t.ToString()
                 });
 
-            var logicTypes = Enum.GetValues(typeof (LogicType))
+            var logicTypes = Enum.GetValues(typeof(LogicType))
                 .OfType<LogicType>()
                 .Select(t => new
                 {
-                    Id = (int) t,
+                    Id = (int)t,
                     LogicName = t.ToString()
                 });
 
-            var inclusionTypes = Enum.GetValues(typeof (InclusionType))
+            var inclusionTypes = Enum.GetValues(typeof(InclusionType))
                 .OfType<InclusionType>()
                 .Select(t => new
                 {
@@ -139,29 +146,80 @@ namespace Bookmarky.DAL.ServiceImplementations
             return initialization;
         }
 
-        public Bookmark_DTO SaveBookmark(Bookmark_DTO bookmark)
+        public Bookmark_DTO CreateBookmark(Bookmark_DTO bookmark)
         {
+            var dbBm = _mapper.MapToBookmarkDb(bookmark);
 
-            if (bookmark.Id == 0)
+            dbBm.Tags.ForEach(t =>
             {
-                var dbBm = bookmark.MapTo<Bookmark_DB>();
-                _context.Set<Bookmark_DB>().Add(dbBm);
-                _context.SaveChanges();	//Todo add error handling
-                bookmark.Id = dbBm.Id;
-            }
-            else
-            {
-                var existingBm = _context.Set<Bookmark_DB>().Find(bookmark.Id);
-                existingBm.Gist = bookmark.Gist;
-                existingBm.ResourceType = (ResourceType)bookmark.ResourceTypeId;
-                existingBm.SourceId = bookmark.SourceId;
-                existingBm.Title = bookmark.Title;
-                existingBm.Url = bookmark.Url;
+                _context.Set<Tag_DB>().Attach(t); //attached tag to context to mark as unchanged
+            });
 
-                _context.SaveChanges();
-            }
+            _context.Set<Bookmark_DB>().Add(dbBm);
+            _context.SaveChanges();	//Todo add error handling
+            bookmark.Id = dbBm.Id;
 
             return bookmark;
+        }
+
+        public Bookmark_DTO UpdateBookmark(Bookmark_DTO bookmark)
+        {
+            //var existingBm = _context.Set<Bookmark_DB>().Find(bookmark.Id);
+            var existingBm = getBookmarks(b => b.Id == bookmark.Id, b => b.Tags)
+                .FirstOrDefault();
+
+            if (existingBm == null)
+                throw new InvalidOperationException("BookmarkId not found");
+
+            existingBm.Gist = bookmark.Gist;
+            existingBm.ResourceType = (ResourceType)bookmark.ResourceType;
+            existingBm.SourceId = bookmark.SourceId;
+            existingBm.Title = bookmark.Title;
+            existingBm.Url = bookmark.Url;
+
+            var dtoTags = bookmark.Tags.ToList();
+
+            var addedTags = getTagsToAdd(dtoTags, existingBm.Tags);
+            addedTags.ForEach(t =>
+            {
+                _context.Set<Tag_DB>().Attach(t);
+                existingBm.Tags.Add(t);
+            });
+
+            var deletedTags = getTagsToRemove(dtoTags,existingBm.Tags);
+            deletedTags.ForEach(t =>
+            {
+                _context.Set<Tag_DB>().Attach(t);
+                existingBm.Tags.Remove(t);
+            });
+
+
+            _context.SaveChanges();
+
+            return bookmark;
+        }
+
+        private IEnumerable<Tag_DB> getTagsToRemove(IEnumerable<Tag_DTO> dtoTags, IEnumerable<Tag_DB> existingTags)
+        {
+            var tagsToDelete = existingTags
+                .Where(dbT => !dtoTags
+                    .Select(dtoT => dtoT.Id)
+                    .Contains(dbT.Id))
+                .ToList();
+
+            return tagsToDelete;
+        }
+
+        private IEnumerable<Tag_DB> getTagsToAdd(IEnumerable<Tag_DTO> dtoTags, IEnumerable<Tag_DB> existingTags)
+        {
+            var newTags = dtoTags
+                .Where(t => !existingTags
+                    .Select(dbT => dbT.Id)
+                    .Contains(t.Id))
+                .Select(_mapper.MapToTagDb)
+                .ToList();
+
+            return newTags;
         }
 
         public IEnumerable<Bookmark_DTO> SearchBookmarksByCriteria(BookmarkSearchCriteria searchCriteria)
@@ -183,7 +241,7 @@ namespace Bookmarky.DAL.ServiceImplementations
         {
             var query = _context.Set<Bookmark_DB>().AsQueryable();
 
-            includes.ForEach(i => query.Include(i));
+            includes.ForEach(i => query = query.Include(i));
 
             if (predicate != null)
             {
@@ -205,5 +263,22 @@ namespace Bookmarky.DAL.ServiceImplementations
             return query.ToList();
         }
 
+        public IEnumerable<Tag_DTO> GetAllTags()
+        {
+            var tags = getTags();
+
+            return tags.Select(_mapper.MapToTagDto);
+        }
+
+        public int CreateTag(Tag_DTO tag)
+        {
+            var dbTag = tag.MapTo<Tag_DB>();
+
+            _context.Set<Tag_DB>().Add(dbTag);
+
+            _context.SaveChanges();
+
+            return dbTag.Id;
+        }
     }
 }
