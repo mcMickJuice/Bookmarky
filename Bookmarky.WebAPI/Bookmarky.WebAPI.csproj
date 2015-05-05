@@ -46,6 +46,10 @@
       <HintPath>..\packages\Autofac.WebApi2.3.4.0\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Omu.ValueInjecter, Version=2.3.3.0, Culture=neutral, PublicKeyToken=c7694541b0ac80e4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\valueinjecter.2.3.3\lib\net35\Omu.ValueInjecter.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -375,6 +379,10 @@
     <ProjectReference Include="..\Bookmarky.DTO\Bookmarky.DTO.csproj">
       <Project>{7adb0321-9235-4d62-867b-15b520c8926f}</Project>
       <Name>Bookmarky.DTO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bookmarky.Utility\Bookmarky.Utility.csproj">
+      <Project>{2d2f4abc-4b7d-4178-98b5-fa89a7a05836}</Project>
+      <Name>Bookmarky.Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

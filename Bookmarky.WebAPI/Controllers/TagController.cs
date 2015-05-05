@@ -28,11 +28,11 @@ namespace Bookmarky.WebAPI.Controllers
         }
 
         [AcceptVerbs("POST")]
-        public int CreateTag(Tag tag)
+        public Tag CreateTag(Tag tag)
         {
-            var createdId = _tagService.CreateTag(tag);
+            var createdTag = _tagService.CreateTag(tag);
 
-            return createdId;
+            return createdTag;
         }
     }
 }

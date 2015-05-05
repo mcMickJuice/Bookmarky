@@ -240,6 +240,7 @@ namespace Bookmarky.DAL.ServiceImplementations
             , params Expression<Func<Bookmark_DB, object>>[] includes)
         {
             var query = _context.Set<Bookmark_DB>().AsQueryable();
+            //var query = _context.Bookmarks.AsQueryable();
 
             includes.ForEach(i => query = query.Include(i));
 
@@ -270,15 +271,15 @@ namespace Bookmarky.DAL.ServiceImplementations
             return tags.Select(_mapper.MapToTagDto);
         }
 
-        public int CreateTag(Tag_DTO tag)
+        public Tag_DTO CreateTag(Tag_DTO tag)
         {
-            var dbTag = tag.MapTo<Tag_DB>();
-
+            var dbTag = _mapper.MapToTagDb(tag);
+            
             _context.Set<Tag_DB>().Add(dbTag);
 
             _context.SaveChanges();
 
-            return dbTag.Id;
+            return _mapper.MapToTagDto(dbTag);
         }
     }
 }

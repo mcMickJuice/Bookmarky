@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using Bookmarky.DAL.EntityModels;
 using Bookmarky.DAL.Mapping;
 using Bookmarky.DAL.ServiceImplementations;
@@ -34,7 +36,7 @@ namespace Bookmarky.Test.UnitTests
 		[Test]
 		public void SaveBookmark_UpdateExisting_NoTags()
 		{
-            _mockSet.Setup(s => s.Find(It.IsAny<int>())).Returns(new Bookmark_Db() { Tags = new List<DAL.EntityModels.Tag>() });
+		    //_mockSet.Setup(s => s.Where(It.IsAny<Expression<Func<Bookmark_Db,bool>>>())).Returns(new List<Bookmark_Db> {new Bookmark_Db() { Tags = new List<DAL.EntityModels.Tag>()}}.AsQueryable);
             _mockContext.Setup(c => c.Set<Bookmark_Db>()).Returns(_mockSet.Object);
             _mockContext.Setup(c => c.SaveChanges());
 

@@ -10,6 +10,6 @@ namespace Bookmarky.DAL.Service
     public interface ITagService
     {
         IEnumerable<Tag> GetAllTags();
-        int CreateTag(Tag tag);
+        Tag CreateTag(Tag tag);
     }
 }

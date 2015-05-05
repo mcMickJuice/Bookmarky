@@ -16,6 +16,8 @@ namespace Bookmarky.DAL.EntityModels
         DbSet Set(Type entityType);
         DbEntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
         DbEntityEntry Entry(object entity);
+        DbSet<Bookmark> Bookmarks { get; set; }
+        DbSet<Tag> Tags { get; set;}
 
         int SaveChanges();
     }
