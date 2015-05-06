@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -37,6 +38,8 @@ namespace Bookmarky.Test.UnitTests
 		public void SaveBookmark_UpdateExisting_NoTags()
 		{
 		    //_mockSet.Setup(s => s.Where(It.IsAny<Expression<Func<Bookmark_Db,bool>>>())).Returns(new List<Bookmark_Db> {new Bookmark_Db() { Tags = new List<DAL.EntityModels.Tag>()}}.AsQueryable);
+		    _mockSet.Setup(m => m.AsQueryable())
+		        .Returns(new List<Bookmark_Db> {new Bookmark_Db() {Id = 1, Tags = new Collection<Tag_Db>()}}.AsQueryable);
             _mockContext.Setup(c => c.Set<Bookmark_Db>()).Returns(_mockSet.Object);
             _mockContext.Setup(c => c.SaveChanges());
 

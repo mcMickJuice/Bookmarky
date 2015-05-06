@@ -240,7 +240,6 @@ namespace Bookmarky.DAL.ServiceImplementations
             , params Expression<Func<Bookmark_DB, object>>[] includes)
         {
             var query = _context.Set<Bookmark_DB>().AsQueryable();
-            //var query = _context.Bookmarks.AsQueryable();
 
             includes.ForEach(i => query = query.Include(i));
 
