@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Bookmarky.DAL.EntityModels;
 using Bookmarky.DTO;
 using Bookmarky.Utility.Extensions;
 using Omu.ValueInjecter;
@@ -30,6 +31,15 @@ namespace Bookmarky.DAL.Mapping
             else
             {
                 bookmarkDto.Tags = new List<Tag_Dto>();
+            }
+
+            if (bookmarkDb.Rating != null)
+            {
+                bookmarkDto.Review = bookmarkDb.Rating.MapTo<Review>(_convention);
+            }
+            else
+            {
+                bookmarkDto.Review = new Review();
             }
 
             return bookmarkDto;
@@ -64,6 +74,20 @@ namespace Bookmarky.DAL.Mapping
             var tagDb = tagDto.MapTo<Tag_Db>(_convention);
 
             return tagDb;
+        }
+
+        public Review MapToReviewDto(Rating rating)
+        {
+            var review = rating.MapTo<Review>(_convention);
+
+            return review;
+        }
+
+        public Rating MapToRatingDb(Review review)
+        {
+            var rating = review.MapTo<Rating>(_convention);
+
+            return rating;
         }
     }
 }

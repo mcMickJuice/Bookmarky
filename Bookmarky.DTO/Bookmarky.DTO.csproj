@@ -46,6 +46,7 @@
     <Compile Include="HomePageSummary.cs" />
     <Compile Include="LogicType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Review.cs" />
     <Compile Include="Tag.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

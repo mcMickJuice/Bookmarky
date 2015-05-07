@@ -22,6 +22,7 @@ namespace Bookmarky.WebAPI.App_Start.Modules
             builder.RegisterType<EFBookmarkDataService>().As<ITagService>();
             builder.RegisterType<BookmarkyMapper>().As<IBookmarkyMapper>();
             builder.RegisterType<DefaultValueInjection>().As<ConventionInjection>();
+            builder.RegisterType<EFBookmarkDataService>().As<IReviewDataService>();
         }
     }
 }

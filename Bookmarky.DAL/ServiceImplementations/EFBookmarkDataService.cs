@@ -16,7 +16,7 @@ using System.Linq.Expressions;
 
 namespace Bookmarky.DAL.ServiceImplementations
 {
-    public class EFBookmarkDataService : IBookmarkDataService, ITagService
+    public class EFBookmarkDataService : IBookmarkDataService, ITagService, IReviewDataService
     {
         private IBookmarkyContext _context;
         private readonly IBookmarkyMapper _mapper;
@@ -55,7 +55,7 @@ namespace Bookmarky.DAL.ServiceImplementations
 
         public Bookmark_DTO GetBookmarkById(int id)
         {
-            var dbBm = getBookmarks(b => b.Id == id, b => b.Tags).FirstOrDefault();
+            var dbBm = getBookmarks(b => b.Id == id, b => b.Tags, b => b.Rating).FirstOrDefault();
 
             if (dbBm == null)
                 return null;
@@ -236,8 +236,66 @@ namespace Bookmarky.DAL.ServiceImplementations
             return bmDbs.Select(r => r.MapTo<Bookmark_DTO>());
         }
 
+        public IEnumerable<Tag_DTO> GetAllTags()
+        {
+            var tags = getTags();
+
+            return tags.Select(_mapper.MapToTagDto);
+        }
+
+        public Tag_DTO CreateTag(Tag_DTO tag)
+        {
+            var dbTag = _mapper.MapToTagDb(tag);
+            
+            _context.Set<Tag_DB>().Add(dbTag);
+
+            _context.SaveChanges();
+
+            return _mapper.MapToTagDto(dbTag);
+        }
+
+        
+        public Review CreateReview(Review review)
+        {
+            var rating = _mapper.MapToRatingDb(review);
+
+            _context.Set<Rating>().Add(rating);
+
+            _context.SaveChanges();
+
+            return _mapper.MapToReviewDto(rating);
+        }
+
+        public Review UpdateReview(Review review)
+        {
+            var rating = getRatings(r => r.Id == review.Id)
+                .FirstOrDefault();
+
+            if (rating == null)
+                return null;
+
+            rating.Overview = review.Overview;
+            rating.Score = review.Score;
+
+            _context.SaveChanges();
+
+            return review;
+        }
+
+        public Review GetReviewById(int id)
+        {
+            var rating = getRatings(r => r.Id == id).FirstOrDefault();
+
+            if (rating == null)
+                return null;
+
+            var review = _mapper.MapToReviewDto(rating);
+
+            return review;
+        }
+
         private IEnumerable<Bookmark_DB> getBookmarks(Expression<Func<Bookmark_DB, bool>> predicate = null
-            , params Expression<Func<Bookmark_DB, object>>[] includes)
+           , params Expression<Func<Bookmark_DB, object>>[] includes)
         {
             var query = _context.Set<Bookmark_DB>().AsQueryable();
 
@@ -263,22 +321,22 @@ namespace Bookmarky.DAL.ServiceImplementations
             return query.ToList();
         }
 
-        public IEnumerable<Tag_DTO> GetAllTags()
+        private IEnumerable<Rating> getRatings(Expression<Func<Rating, bool>> predicate = null
+            , params Expression<Func<Rating, object>>[] includes)
         {
-            var tags = getTags();
+            var query = _context.Set<Rating>().AsQueryable();
 
-            return tags.Select(_mapper.MapToTagDto);
-        }
+            includes.ForEach(i =>
+            {
+                query = query.Include(i);
+            });
 
-        public Tag_DTO CreateTag(Tag_DTO tag)
-        {
-            var dbTag = _mapper.MapToTagDb(tag);
-            
-            _context.Set<Tag_DB>().Add(dbTag);
+            if (predicate != null)
+            {
+                query = query.AsExpandable().Where(predicate);
+            }
 
-            _context.SaveChanges();
-
-            return _mapper.MapToTagDto(dbTag);
+            return query.ToList();
         }
     }
 }

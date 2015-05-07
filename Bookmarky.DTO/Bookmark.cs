@@ -17,6 +17,7 @@ namespace Bookmarky.DTO
         public int? SourceId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public IEnumerable<Tag> Tags { get; set; }
+        public Review Review { get; set; }
 
     }
 }
