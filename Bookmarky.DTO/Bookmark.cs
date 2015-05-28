@@ -18,6 +18,5 @@ namespace Bookmarky.DTO
         public DateTime? CreatedDate { get; set; }
         public IEnumerable<Tag> Tags { get; set; }
         public Review Review { get; set; }
-
     }
 }

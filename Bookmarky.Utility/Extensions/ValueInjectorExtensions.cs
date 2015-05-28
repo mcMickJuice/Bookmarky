@@ -28,8 +28,14 @@ namespace Bookmarky.Utility.Extensions
     {
         protected override bool Match(ConventionInfo c)
 		{
-            if(c.SourceProp.Type.IsPrimitive || c.SourceProp.Type.Name == "String")
-			    return c.SourceProp.Name == c.TargetProp.Name;
+            if (c.SourceProp.Name != c.TargetProp.Name)
+                return false;
+
+            if (c.SourceProp.Type.IsPrimitive || c.SourceProp.Type.Name == "String")
+                return true;
+
+            if (c.SourceProp.Type.IsEnum)
+                return true;
 
             return false;
 		}
