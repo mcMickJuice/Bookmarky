@@ -40,11 +40,12 @@ namespace Bookmarky.DAL.Schema
 
 			var ratings = new List<Rating>
 			{
-				new Rating { Overview="It was basass", Score = 5, BookmarkId = b1.Id},
-				new Rating { Overview="It was ok", Score = 3, BookmarkId = b2.Id},
+				new Rating { Overview="It was basass", Score = 5, Bookmark = b1},
+				new Rating { Overview="It was ok", Score = 3, Bookmark = b2},
 			};
 
 			context.Ratings.AddRange(ratings);
+		    context.SaveChanges();
 
 			var sources = new List<Source>
 			{
@@ -52,6 +53,8 @@ namespace Bookmarky.DAL.Schema
 			};
 
 			context.Sources.AddRange(sources);
+
+		    context.SaveChanges();
 		}
 	}
 }

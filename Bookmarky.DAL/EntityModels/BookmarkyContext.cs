@@ -42,7 +42,7 @@ namespace Bookmarky.DAL.EntityModels
 			modelBuilder.Entity<Rating>()
 				.HasKey(r => r.Id)
 				.Property(r => r.Id)
-				.HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity)
+                //.HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity)
 				.HasColumnName("RatingId");
 
 			modelBuilder.Entity<Bookmark>()
@@ -51,9 +51,18 @@ namespace Bookmarky.DAL.EntityModels
 				.HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity)
 				.HasColumnName("BookmarkId");
 
-			modelBuilder.Entity<Bookmark>()
-				.HasOptional(b => b.Rating)
-				.WithOptionalDependent();
+		    modelBuilder.Entity<Bookmark>()
+		        .HasOptional(b => b.Rating)
+		        .WithRequired(r => r.Bookmark)
+		        .WillCascadeOnDelete(true);
+
+            //modelBuilder.Entity<Rating>()
+            //    .HasRequired(b => b.Bookmark)
+            //    .WithOptional(c => c.Rating);
+
+            //modelBuilder.Entity<Rating>()
+            //    .HasRequired(r => r.Bookmark)
+            //    .WithRequiredPrincipal();
 
 		    modelBuilder.Entity<Bookmark>()
 		        .HasMany(b => b.Tags)

@@ -14,9 +14,9 @@ namespace Bookmarky.DAL.EntityModels
 		public string Overview { get; set; }
 		[Range(1,5)]
 		public int Score { get; set; }
-		public int BookmarkId { get; set; }
+        //public int BookmarkId { get; set; }
 		public DateTime? CreatedDate { get; set; }
 
-		public virtual Bookmark Bookmark { get; set; }
+		public Bookmark Bookmark { get; set; }
 	}
 }

@@ -173,7 +173,7 @@ namespace Bookmarky.DAL.ServiceImplementations
 
             existingBm.Gist = bookmark.Gist;
             existingBm.ResourceType = (ResourceType)bookmark.ResourceType;
-            existingBm.SourceId = bookmark.SourceId;
+           // existingBm.Source = bookmark.Source;
             existingBm.Title = bookmark.Title;
             existingBm.Url = bookmark.Url;
 
@@ -258,6 +258,7 @@ namespace Bookmarky.DAL.ServiceImplementations
         public Review CreateReview(Review review)
         {
             var rating = _mapper.MapToRatingDb(review);
+            rating.Id = review.BookmarkId;
 
             _context.Set<Rating>().Add(rating);
 

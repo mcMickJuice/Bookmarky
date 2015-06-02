@@ -16,12 +16,12 @@ namespace Bookmarky.DAL.EntityModels
 
 		public bool IsRead { get; set; }
 
-		public int? SourceId { get; set; }
+        //public int? SourceId { get; set; }
+        //public int? RatingId { get; set; }
 
 		public DateTime? CreatedDate { get; set; }
-
-		public virtual Source Source { get; set; }
-		public virtual Rating Rating { get; set; }
+		public Source Source { get; set; }
+		public Rating Rating { get; set; }
         public virtual ICollection<Tag> Tags { get; set; }
 	}
 }
