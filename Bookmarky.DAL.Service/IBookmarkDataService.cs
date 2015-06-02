@@ -22,7 +22,7 @@ namespace Bookmarky.DAL.Service
 	    Bookmark CreateBookmark(Bookmark bookmark);
 		void UpdateIsReadStatus(int bookmarkId,bool isRead);
         IEnumerable<Bookmark> SearchBookmarksByCriteria(BookmarkSearchCriteria searchCriteria);
-        HomePageSummary GetHomePageSummary();
+        HomePageSummary GetHomePageSummary();            
         BookmarkSearchInitialization CreateInitialSearchObject();
 
 	}

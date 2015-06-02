@@ -26,7 +26,7 @@ namespace Bookmarky.DAL.EntityModels
 		public DbSet<Bookmark> Bookmarks { get; set; }
 		public DbSet<Source> Sources { get; set; }
 		public DbSet<Rating> Ratings { get; set; }
-        public DbSet<StickiedBookmark> StickedBookmarks { get; set; }
+        //public DbSet<StickiedBookmark> StickedBookmarks { get; set; }
         public DbSet<Tag> Tags { get; set;}
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)

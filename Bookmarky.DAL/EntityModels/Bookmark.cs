@@ -15,6 +15,8 @@ namespace Bookmarky.DAL.EntityModels
 		public string Gist { get; set; }
 
 		public bool IsRead { get; set; }
+        public string LinkIconUrl { get; set; }
+        public bool IsStickied { get; set; }
 
         //public int? SourceId { get; set; }
         //public int? RatingId { get; set; }

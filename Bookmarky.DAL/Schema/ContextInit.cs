@@ -21,13 +21,14 @@ namespace Bookmarky.DAL.Schema
 
 			var b1 = new Bookmark { Title = "Bookmark 1", Gist = "The maiden voyage", Url = "www.buttlash.com", ResourceType = ResourceType.Article };
 			var b2 = new Bookmark { Title = "Bookmark 2", Gist = "Something Else", Url = "www.youtube.com", ResourceType = ResourceType.Video };
-		    var b3 = new StickiedBookmark()
+		    var b3 = new Bookmark
 		    {
 		        Title = "MDN",
 		        Gist = "Mozilla Reference of EVERYTHING",
 		        Url = "https://developer.mozilla.org/en-US/",
 		        ResourceType = ResourceType.Reference,
-		        LinkIconUrl = "https://developer.cdn.mozilla.net/media/img/favicon144.png"
+		        LinkIconUrl = "https://developer.cdn.mozilla.net/media/img/favicon144.png",
+                IsStickied = true
 		    };
             var bookmarks = new List<Bookmark>
 			{

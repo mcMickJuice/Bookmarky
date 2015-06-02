@@ -80,13 +80,13 @@ namespace Bookmarky.DAL.ServiceImplementations
 
         public HomePageSummary GetHomePageSummary()
         {
-            var stickied = _context.Set<Bookmark_DB>()
-                .OfType<StickiedBookmark>()
-                .ToList();
+            var bookmarks = getBookmarks();
+
+            var stickied = bookmarks.Where(bm => bm.IsStickied);
 
             var stickiedDto = stickied.Select(_mapper.MapToBookmarkDto);
 
-            var recent = _context.Set<Bookmark_DB>().OrderByDescending(b => b.CreatedDate)
+            var recent = bookmarks
                 .Take(10)
                 .ToList();
 
@@ -176,6 +176,7 @@ namespace Bookmarky.DAL.ServiceImplementations
            // existingBm.Source = bookmark.Source;
             existingBm.Title = bookmark.Title;
             existingBm.Url = bookmark.Url;
+            existingBm.IsStickied = bookmark.IsStickied;
 
             var dtoTags = bookmark.Tags.ToList();
 
@@ -295,7 +296,7 @@ namespace Bookmarky.DAL.ServiceImplementations
             return review;
         }
 
-        private IEnumerable<Bookmark_DB> getBookmarks(Expression<Func<Bookmark_DB, bool>> predicate = null
+        private IList<Bookmark_DB> getBookmarks(Expression<Func<Bookmark_DB, bool>> predicate = null
            , params Expression<Func<Bookmark_DB, object>>[] includes)
         {
             var query = _context.Set<Bookmark_DB>().AsQueryable();
@@ -310,7 +311,7 @@ namespace Bookmarky.DAL.ServiceImplementations
             return query.ToList();
         }
 
-        private IEnumerable<Tag_DB> getTags(Expression<Func<Tag_DB, bool>> predicate = null)
+        private IList<Tag_DB> getTags(Expression<Func<Tag_DB, bool>> predicate = null)
         {
             var query = _context.Set<Tag_DB>().AsQueryable();
 
@@ -322,7 +323,7 @@ namespace Bookmarky.DAL.ServiceImplementations
             return query.ToList();
         }
 
-        private IEnumerable<Rating> getRatings(Expression<Func<Rating, bool>> predicate = null
+        private IList<Rating> getRatings(Expression<Func<Rating, bool>> predicate = null
             , params Expression<Func<Rating, object>>[] includes)
         {
             var query = _context.Set<Rating>().AsQueryable();

@@ -18,5 +18,7 @@ namespace Bookmarky.DTO
         public DateTime? CreatedDate { get; set; }
         public IEnumerable<Tag> Tags { get; set; }
         public Review Review { get; set; }
+        public string LinkIconUrl { get; set; }
+        public bool IsStickied { get; set; }
     }
 }
