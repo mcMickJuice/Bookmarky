@@ -177,6 +177,7 @@ namespace Bookmarky.DAL.ServiceImplementations
             existingBm.Title = bookmark.Title;
             existingBm.Url = bookmark.Url;
             existingBm.IsStickied = bookmark.IsStickied;
+            existingBm.LinkIconUrl = bookmark.LinkIconUrl;
 
             var dtoTags = bookmark.Tags.ToList();
 
